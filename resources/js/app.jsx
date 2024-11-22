@@ -8,6 +8,8 @@ import AllReactProjects from './Components/Projects/AllReactProjects';
 import AllRustProjects from './Components/Projects/AllRustProjects';
 import Cv from './Components/cv';
 import Contact from './Components/contact';
+import CreateAccount from './Components/CreateAccount';
+import Login from './Components/Login';
 
 function App() {
     return (
@@ -20,6 +22,8 @@ function App() {
                 <Route path="/projects/rust" element={<AllRustProjects />} />
                 <Route path="/cv" element={<Cv />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/createaccount" element={<CreateAccount />} />
+                <Route path="/login" element={<Login />} />
             </Routes>
         </Router>
     );
