@@ -10,6 +10,7 @@ import Cv from './Components/cv';
 import Contact from './Components/contact';
 import CreateAccount from './Components/CreateAccount';
 import Login from './Components/Login';
+import Account from './Components/Account';
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/createaccount" element={<CreateAccount />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/account" element={<Account />} />
             </Routes>
         </Router>
     );

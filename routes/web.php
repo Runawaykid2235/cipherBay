@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
+use Illuminate\Support\Facades\Auth;
+
 
 // Serve the welcome page for the home route
 Route::get('/', function () {
@@ -48,9 +52,16 @@ Route::get('/createaccount', function () {
 //post route for account creation
 Route::post('/api/createaccount', [UserController::class, 'create']);
 
-Route::get('/login', function () {
-    return view('login');
-});
 
-// Route for api endpoint to log in user
-Route::post('/api/login', [UserController::class, 'Login']);
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth')->get('/account', [AccountController::class, 'index'])->name('account');
+
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+
+Route::middleware('auth')->get('/api/account', function () {
+    return response()->json(['user' => Auth::user()]);
+});
