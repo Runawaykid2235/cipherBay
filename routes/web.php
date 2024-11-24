@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\WalletController;
 
 
 // Serve the welcome page for the home route
@@ -65,3 +66,7 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::middleware('auth')->get('/api/account', function () {
     return response()->json(['user' => Auth::user()]);
 });
+
+
+
+Route::middleware('auth')->get('/api/walletamount', [WalletController::class, 'getWalletAmount']);
