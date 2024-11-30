@@ -6,7 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\WalletController;
-
+use App\Http\Controllers\TreatiesController;
 
 // Serve the welcome page for the home route
 Route::get('/', function () {
@@ -68,5 +68,6 @@ Route::middleware('auth')->get('/api/account', function () {
 });
 
 
-
 Route::middleware('auth')->get('/api/walletamount', [WalletController::class, 'getWalletAmount']);
+
+Route::middleware('auth')->post('/api/createtreaty', [TreatiesController::class, 'createTreaty']);

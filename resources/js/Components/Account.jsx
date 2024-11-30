@@ -7,6 +7,13 @@ function Account() {
     const [walletAmount, setWalletAmount] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [treatyDetails, setTreatyDetails] = useState({
+        recipient_username: '',
+        item_details: '',
+        price: '',
+        terms: {} // For storing terms as a JSON object
+    });
+    const [treatyResponse, setTreatyResponse] = useState(null);
 
     useEffect(() => {
         // Fetch the authenticated user's details
@@ -32,6 +39,42 @@ function Account() {
         fetchWalletAmount();
     }, []);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setTreatyDetails((prevState) => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        const { recipient_username, item_details, price, terms } = treatyDetails;
+        const termsObject = {
+            item_name: item_details,
+            price,
+            terms: terms // More specific fields could be added here depending on your form structure
+        };
+
+        try {
+            const response = await axios.post('/api/createtreaty', {
+                initiator_username: user.username,
+                recipient_username,
+                decrypt_key: 'some_decrypt_key', // You will likely need to fetch or generate this key
+                terms: termsObject
+            }, { withCredentials: true });
+
+            setTreatyResponse(response.data);
+        } catch (err) {
+            setError(err.response?.data?.message || "An error occurred while creating the treaty.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (!user) {
         return <p>Loading...</p>;
     }
@@ -40,9 +83,57 @@ function Account() {
         <div>
             <Navbar />
             <h1>Welcome, {user.username}!</h1>
-            <p>Your btc Adress: {user.public_key}</p>
+            <p>Your BTC Address: {user.public_key}</p>
             {loading ? <p>Loading wallet balance...</p> : <p>Wallet balance: {walletAmount !== null ? walletAmount : 'N/A'}</p>}
             {error && <p style={{ color: "red" }}>{error}</p>}
+
+            <div>
+                <p>Start a treaty with another user:</p>
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label>Recipient Username:</label>
+                        <input
+                            type="text"
+                            name="recipient_username"
+                            value={treatyDetails.recipient_username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Item Details:</label>
+                        <input
+                            type="text"
+                            name="item_details"
+                            value={treatyDetails.item_details}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Price (BTC):</label>
+                        <input
+                            type="number"
+                            name="price"
+                            value={treatyDetails.price}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Terms (JSON format):</label>
+                        <textarea
+                            name="terms"
+                            value={JSON.stringify(treatyDetails.terms)}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <button type="submit">Create Treaty</button>
+                </form>
+
+                {treatyResponse && <p>{treatyResponse.message}</p>}
+            </div>
         </div>
     );
 }
