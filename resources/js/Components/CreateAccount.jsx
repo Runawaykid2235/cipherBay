@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 function CreateAccount() {
     const [username, setUsername] = useState("");
@@ -7,6 +9,30 @@ function CreateAccount() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [user, setUser] = useState(null);
+
+    const navigate = useNavigate();
+
+    // Fetch user on component mount
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get('/api/account', { withCredentials: true });
+                setUser(response.data.user); // Assuming the API returns the user object
+                // navigate user to /account
+                if (response.data.user) {
+                    navigate('/account')
+                }
+                
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                setUser(null); // Set to null if there's an error
+            }
+        };
+
+        fetchUser();
+    }, []);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -42,6 +68,7 @@ function CreateAccount() {
 
     return (
         <div>
+            <Navbar />
             <h1>Create Account</h1>
             {error && <p style={{ color: "red" }}>{error}</p>}
             {success && <p style={{ color: "green" }}>{success}</p>}

@@ -9,6 +9,50 @@ use Illuminate\Support\Facades\Validator;
 
 class TreatiesController extends Controller
 {
+    public function readTreatiesAmount(Request $request)
+    {
+        // Validate input (username is passed as a query parameter)
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+        ]);
+    
+        try {
+            // Fetch treaty counts
+            $username = $validated['username'];
+    
+
+            Log::info("Fetching treaties for username: " . $username);
+
+
+            // Count treaties where the user is the recipient
+            $incoming_treaty_amount = DB::table('treaties')
+                ->where('recipient_username', $username)
+                ->count();
+    
+            // Count treaties where the user is the initiator
+            $outgoing_treaty_amount = DB::table('treaties')
+                ->where('initiator_username', $username)
+                ->count();
+    
+            // Total treaties
+            $total_treaty_amount = $incoming_treaty_amount + $outgoing_treaty_amount;
+    
+            return response()->json([
+                'incoming' => $incoming_treaty_amount,
+                'outgoing' => $outgoing_treaty_amount,
+                'total' => $total_treaty_amount,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error reading treaty amounts: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to retrieve treaty amounts.',
+            ], 500);
+        }
+    }
+    
+
+
+
     public function createTreaty(Request $request)
     {
         // Validate inputs
@@ -34,6 +78,15 @@ class TreatiesController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ];
+
+        // Check if recipient user exists before allowing a treaty to be created
+        $recipientUsername = $request->input('recipient_username');
+        $recipientExists = DB::table('users')->where('username', $recipientUsername)->exists();
+
+
+        if (!$recipientExists) {
+            return response()->json(['message' => 'Recipient user does not exist.'], 400);
+        }
 
         try {
             // Insert into database

@@ -11,6 +11,7 @@ import Contact from './Components/contact';
 import CreateAccount from './Components/CreateAccount';
 import Login from './Components/Login';
 import Account from './Components/Account';
+import Treaties from './Components/treaties';
 
 function App() {
     return (
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/createaccount" element={<CreateAccount />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/treaties" element={<Treaties />} />
             </Routes>
         </Router>
     );

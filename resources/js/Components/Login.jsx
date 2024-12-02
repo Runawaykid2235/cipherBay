@@ -1,10 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [user, setUser] = useState(null);
+
+    const navigate = useNavigate();
+
+    // Fetch user on component mount
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get('/api/account', { withCredentials: true });
+                setUser(response.data.user); // Assuming the API returns the user object
+                // navigate user to /account
+                if (response.data.user) {
+                    navigate('/account')
+                }
+                
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                setUser(null); // Set to null if there's an error
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -12,7 +36,9 @@ const Login = () => {
             const response = await axios.post('/api/login', { username, password });
             if (response.data.success) {
                 setMessage('Login successful!');
-                // Redirect user or store token/session info if needed
+                // Optionally refetch user data after login
+                const userResponse = await axios.get('/api/account', { withCredentials: true });
+                setUser(userResponse.data.user);
             } else {
                 setMessage('Login failed: ' + response.data.message);
             }
@@ -47,6 +73,11 @@ const Login = () => {
                 <button type="submit">Login</button>
             </form>
             {message && <p>{message}</p>}
+            {user ? (
+                <p>Current User is: {user.username || 'Unknown'}</p>
+            ) : (
+                <p>No user is currently logged in.</p>
+            )}
         </div>
     );
 };

@@ -1,0 +1,66 @@
+/* Navbar.css */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Separate links and user info */
+    align-items: center; /* Vertically align items */
+    background-color: #333;
+    padding: 1rem 2rem; /* Extra space for aesthetics */
+    color: white;
+  }
+  
+  .navbar-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem; /* Space between navigation links */
+  }
+  
+  .navbar-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-link:hover {
+    color: #ff6347;
+  }
+  
+  .navbar-user-info {
+    text-align: right;
+    font-size: 1.2rem; /* Set base font size for alignment */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  
+  .navbar-user-info:hover {
+    transform: translateY(-5px); /* Hover lift effect */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #444; /* Subtle hover background */
+  }
+  
+  .navbar-username {
+    font-size: 1.5rem; /* Larger username font size */
+    font-weight: bold;
+    color: white;
+    text-decoration: none; /* Remove underline */
+  }
+  
+  .navbar-username:hover {
+    color: #ffdf00; /* Highlight username on hover */
+  }
+  
+  .navbar-wallet {
+    padding-left: 26px;
+    font-size: 1rem; /* Slightly smaller font for wallet amount */
+    color: #ffdf00;
+  }
+  
+  .error {
+    color: red;
+    font-size: 0.9rem;
+  }
+  
