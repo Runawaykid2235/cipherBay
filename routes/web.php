@@ -77,3 +77,4 @@ Route::middleware('auth')->get('/api/account', function () {
 Route::middleware('auth')->get('/api/walletamount', [WalletController::class, 'getWalletAmount']);
 Route::middleware('auth')->post('/api/createtreaty', [TreatiesController::class, 'createTreaty']);
 Route::middleware('auth')->get('/api/treaty-amount', [TreatiesController::class, 'readTreatiesAmount']);
+Route::middleware('auth')->get('/api/getAllTreaties', [TreatiesController::class, 'getAllTreaties']);

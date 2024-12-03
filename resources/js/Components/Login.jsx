@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from './Navbar';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -33,7 +34,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/login', { username, password });
+            const response = await axios.post('/login', { username, password });
             if (response.data.success) {
                 setMessage('Login successful!');
                 // Optionally refetch user data after login
@@ -50,6 +51,7 @@ const Login = () => {
 
     return (
         <div>
+            <Navbar />
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>

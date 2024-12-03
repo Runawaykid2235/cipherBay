@@ -51,6 +51,42 @@ class TreatiesController extends Controller
     }
     
 
+    public function getAllTreaties(Request $request)
+    {
+        // Validate input
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+        ]);
+
+        try {
+            $username = $validated['username'];
+            Log::info("Fetching treaties for username: " . $username);
+
+            // Fetch incoming and outgoing treaties
+            $incoming_treaties = DB::table('treaties')
+                ->where('recipient_username', $username)
+                ->get();
+
+            $outgoing_treaties = DB::table('treaties')
+                ->where('initiator_username', $username)
+                ->get();
+
+            // Combine the results into one list
+            $all_treaties = $incoming_treaties->merge($outgoing_treaties);
+
+            // Return the treaties as JSON
+            return response()->json([
+                'treaties' => $all_treaties,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving treaties: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to retrieve treaties.',
+            ], 500);
+        }
+    }
+
+    // we need a function to accept or decline the treaty
 
 
     public function createTreaty(Request $request)

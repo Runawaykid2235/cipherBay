@@ -43,6 +43,7 @@ const Navbar = () => {
         <li className="navbar-item"><Link to="/" className="navbar-link">Home</Link></li>
         <li className="navbar-item"><Link to="/createaccount" className="navbar-link">Create Account</Link></li>
         <li className="navbar-item"><Link to="/login" className="navbar-link">Login</Link></li>
+        <li className="navbar-item"><Link to="/treaties" className="navbar-link">Treaties</Link></li>
       </ul>
       {user && walletAmount !== null ? (
         <div className="navbar-user-info">
