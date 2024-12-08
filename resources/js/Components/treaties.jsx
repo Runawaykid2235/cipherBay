@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import axios from "axios";
-import "./styling/Treaties.css"; // Import CSS file
+import "./styling/Treaties.css";
 
 function Treaties() {
     const [user, setUser] = useState(null);
@@ -16,23 +16,45 @@ function Treaties() {
             .catch((error) => console.error(error));
     }, []);
 
-    // Fetch authenticated user's treaties
+    // Fetch treaties
     useEffect(() => {
         if (user && user.username) {
             axios
                 .get(`/api/getAllTreaties?username=${user.username}`)
-                .then(response => {
+                .then((response) => {
                     if (response.data && response.data.treaties) {
                         setTreaties(response.data.treaties);
-                    } else {
-                        console.warn("No treaties found in response:", response.data);
                     }
                 })
-                .catch(error => {
-                    console.error("Error fetching treaties:", error);
-                });
+                .catch((error) => console.error("Error fetching treaties:", error));
         }
     }, [user]);
+
+    const handleAcceptTreaty = (treatyId) => {
+        axios.post('/api/acceptTreaty', { treaty_id: treatyId, username: user.username })
+            .then((response) => {
+                alert("Treaty accepted successfully!");
+                // Update the treaties list after successful acceptance
+                setTreaties(treaties.map(t => t.id === treatyId ? { ...t, treaty_status: "accepted" } : t));
+            })
+            .catch((error) => {
+                console.error("Error accepting treaty:", error);
+                alert("Failed to accept the treaty.");
+            });
+    };
+
+    const handleDenyTreaty = (treatyId) => {
+        axios.post('/api/denyTreaty', { treaty_id: treatyId, username: user.username })
+            .then((response) => {
+                alert("Treaty denied successfully!");
+                // Update the treaties list after successful denial
+                setTreaties(treaties.map(t => t.id === treatyId ? { ...t, treaty_status: "denied" } : t));
+            })
+            .catch((error) => {
+                console.error("Error denying treaty:", error);
+                alert("Failed to deny the treaty.");
+            });
+    };
 
     const filteredTreaties = (type) => {
         if (type === "outgoing") {
@@ -72,7 +94,8 @@ function Treaties() {
                             <p><strong>Status:</strong> {treaty.treaty_status}</p>
                             <p><strong>Terms:</strong> {treaty.terms}</p>
                             <p><strong>Created At:</strong> {treaty.created_at}</p>
-                            <button>Accept</button> <button>Decline</button>
+                            <button onClick={() => handleAcceptTreaty(treaty.id)}>Accept</button>
+                            <button onClick={() => handleDenyTreaty(treaty.id)}>Decline</button>
                         </div>
                     ))
                 ) : (

@@ -36,4 +36,21 @@ class AuthController extends Controller
             'message' => 'Invalid username or password.',
         ]);
     }
+
+
+        // Logout the user and invalidate their session
+    public function logout(Request $request)
+    {
+        // Log out the user
+        Auth::logout();
+
+        // Invalidate the session
+        $request->session()->invalidate();
+
+        // Regenerate the CSRF token for security
+        $request->session()->regenerateToken();
+
+        // Redirect to the login page or home page
+        return redirect('/login');
+    }
 }

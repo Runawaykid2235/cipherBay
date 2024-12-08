@@ -49,6 +49,10 @@ Route::get('/treaties', function () {
     return view('treaties');
 });
 
+Route::get('/createtreaty', function () {
+    return view('createtreaty');
+});
+
 //Get route for create account
 Route::get('/createaccount', function () {
     return view('createaccount');
@@ -66,12 +70,16 @@ Route::middleware('auth')->get('/account', [AccountController::class, 'index'])-
 
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/api/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 Route::middleware('auth')->get('/api/account', function () {
     return response()->json(['user' => Auth::user()]);
 });
 
 
+Route::middleware('auth')->post('/api/acceptTreaty', [TreatiesController::class, 'acceptTreaty']);
+Route::middleware('auth')->post('/api/denyTreaty', [TreatiesController::class, 'denyTreaty']);
 
 
 Route::middleware('auth')->get('/api/walletamount', [WalletController::class, 'getWalletAmount']);

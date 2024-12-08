@@ -50,7 +50,6 @@ class TreatiesController extends Controller
         }
     }
     
-
     public function getAllTreaties(Request $request)
     {
         // Validate input
@@ -86,7 +85,129 @@ class TreatiesController extends Controller
         }
     }
 
-    // we need a function to accept or decline the treaty
+    public function denyTreaty(Request $request)
+    {
+        // Validate input
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+            'treaty_id' => 'required|integer',
+        ]);
+
+        $treaty_id = $validated['treaty_id'];
+
+        // change treaty status to denied
+        DB::table('treaties')
+                ->where('Id', $treaty_id)
+                ->update(['treaty_status' => 'denied']);
+
+        return response()->json(['message' => 'Treaty denied successfully.']);
+    }
+
+    public function acceptTreaty(Request $request)
+    {
+        // Validate input
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+            'treaty_id' => 'required|integer',
+        ]);
+
+        $treaty_id = $validated['treaty_id'];
+
+
+        try {
+            $username = $validated['username'];
+            Log::info("Accepting treaty for username: $username");
+            Log::info("Treaty ID: $treaty_id");
+
+            // Get buyer's wallet details
+            $user = DB::table('users')
+                ->where('username', $username)
+                ->first(['public_key', 'private_key']);
+
+            if (!$user) {
+                throw new Exception("User not found: $username");
+            }
+
+            $recipient_username_public_key = $user->public_key;
+            $recipient_username_private_key = $user->private_key;
+
+            
+
+            // Get the treaty terms
+            $treaty = DB::table('treaties')
+                ->where('Id', $treaty_id)
+                ->value('terms');
+
+            if (!$treaty) {
+                throw new Exception("Treaty not found: $treaty_id");
+            }
+
+            // Decode JSON terms
+            $terms = json_decode($treaty, true);
+            if (!isset($terms['price'])) {
+                throw new Exception("Price not found in treaty terms.");
+            }
+
+            $price = $terms['price'];
+
+            // Check if user has enough funds in escrow account to buy the item
+            // Path to the Python script
+            $pythonScriptPathAmount = base_path('Scripts/get_wallet_amount.py');
+
+            // Execute the script and capture output
+            $wallet_amount = shell_exec("python3 {$pythonScriptPathAmount} {$username}");
+            $wallet_amount = floatval($wallet_amount);
+            
+            if ($wallet_amount > $price) {
+                // Proceed with payment
+            } else {
+                return response()->json(['error' => 'Insufficient funds.'], 400);
+            }
+            
+            // Calculate funds distribution
+            $cipherBaysCut = $price * 0.10;
+            $usersEarnings = $price - $cipherBaysCut;
+
+            // Our wallet address (CipherBay)
+            $receiver = "bc1qf0h0wejx0fzu03qteecs2xp8uusteyypduhgu0";
+
+            // Path to the Python script
+            $pythonScriptPath = base_path('Scripts/send_funds.py');
+
+            // Send CipherBay's cut
+            $command1 = "python3 {$pythonScriptPath} {$recipient_username_public_key} {$recipient_username_private_key} {$receiver} {$cipherBaysCut}";
+            $output1 = shell_exec($command1);
+            Log::info("CipherBay cut transaction output: $output1");
+
+            // Get seller's wallet details
+            $seller = DB::table('users')
+                ->where('id', $terms['seller_id'])
+                ->first(['public_key']);
+
+            if (!$seller) {
+                throw new Exception("Seller not found for treaty ID: $treaty_id");
+            }
+
+            $seller_public_key = $seller->public_key;
+
+            // Send funds to the seller
+            $command2 = "python3 {$pythonScriptPath} {$recipient_username_public_key} {$recipient_username_private_key} {$seller_public_key} {$usersEarnings}";
+            $output2 = shell_exec($command2);
+            Log::info("Seller transaction output: $output2");
+
+            // When its all send then we need to change the treaty from pending to accepted
+            // AND WE NEED TO GIVE THE BUYER THE DECRYPT KEY
+
+            DB::table('treaties')
+                ->where('Id', $treaty_id)
+                ->update(['status' => 'accepted']);
+
+            return response()->json(['message' => 'Treaty accepted successfully.']);
+        } catch (Exception $e) {
+            Log::error("Error accepting treaty: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 
     public function createTreaty(Request $request)

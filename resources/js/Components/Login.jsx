@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
+import './styling/Login.css'; // Import the CSS file
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -11,23 +12,19 @@ const Login = () => {
 
     const navigate = useNavigate();
 
-    // Fetch user on component mount
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const response = await axios.get('/api/account', { withCredentials: true });
-                setUser(response.data.user); // Assuming the API returns the user object
-                // navigate user to /account
+                setUser(response.data.user);
                 if (response.data.user) {
-                    navigate('/account')
+                    navigate('/account');
                 }
-                
             } catch (error) {
                 console.error('Error fetching user:', error);
-                setUser(null); // Set to null if there's an error
+                setUser(null);
             }
         };
-
         fetchUser();
     }, []);
 
@@ -37,7 +34,6 @@ const Login = () => {
             const response = await axios.post('/login', { username, password });
             if (response.data.success) {
                 setMessage('Login successful!');
-                // Optionally refetch user data after login
                 const userResponse = await axios.get('/api/account', { withCredentials: true });
                 setUser(userResponse.data.user);
             } else {
@@ -50,36 +46,42 @@ const Login = () => {
     };
 
     return (
-        <div>
+        <div className="login-container">
             <Navbar />
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Username:</label>
-                    <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit">Login</button>
-            </form>
-            {message && <p>{message}</p>}
-            {user ? (
-                <p>Current User is: {user.username || 'Unknown'}</p>
-            ) : (
-                <p>No user is currently logged in.</p>
-            )}
+            <div className="login-content">
+                <h2>Login</h2>
+                <form className="login-form" onSubmit={handleLogin}>
+                    <div className="form-group">
+                        <label htmlFor="username">Username:</label>
+                        <input
+                            type="text"
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter your username"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="submit-button">Login</button>
+                </form>
+                {message && <p className={`message ${message.includes('successful') ? 'success' : 'error'}`}>{message}</p>}
+                {user ? (
+                    <p className="user-info">Current User is: {user.username || 'Unknown'}</p>
+                ) : (
+                    <p className="user-info">No user is currently logged in.</p>
+                )}
+            </div>
         </div>
     );
 };

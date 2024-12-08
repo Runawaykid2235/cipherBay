@@ -12,6 +12,8 @@ import CreateAccount from './Components/CreateAccount';
 import Login from './Components/Login';
 import Account from './Components/Account';
 import Treaties from './Components/treaties';
+import Home from './Components/Home';
+import CreateTreaty from './Components/CreateTreaty';
 
 function App() {
     return (
@@ -28,6 +30,8 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/treaties" element={<Treaties />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/createtreaty" element={<CreateTreaty />} />
             </Routes>
         </Router>
     );
