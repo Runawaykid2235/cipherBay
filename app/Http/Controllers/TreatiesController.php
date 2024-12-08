@@ -61,13 +61,24 @@ class TreatiesController extends Controller
             $username = $validated['username'];
             Log::info("Fetching treaties for username: " . $username);
 
-            // Fetch incoming and outgoing treaties
+            // Fetch incoming treaties
             $incoming_treaties = DB::table('treaties')
                 ->where('recipient_username', $username)
+                ->select(
+                    'id',
+                    'initiator_username',
+                    'recipient_username',
+                    'treaty_status',
+                    'terms',
+                    'created_at',
+                    DB::raw("CASE WHEN treaty_status = 'accepted' THEN decrypt_key ELSE NULL END AS decrypt_key") // Only include decrypt_key if status is accepted
+                )
                 ->get();
 
+            // Fetch outgoing treaties without decrypt_key
             $outgoing_treaties = DB::table('treaties')
                 ->where('initiator_username', $username)
+                ->select('id', 'initiator_username', 'recipient_username', 'treaty_status', 'terms', 'created_at') // Exclude decrypt_key
                 ->get();
 
             // Combine the results into one list
@@ -84,6 +95,7 @@ class TreatiesController extends Controller
             ], 500);
         }
     }
+
 
     public function denyTreaty(Request $request)
     {

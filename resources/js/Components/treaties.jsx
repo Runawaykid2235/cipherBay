@@ -87,21 +87,32 @@ function Treaties() {
             <div className="treaty-list">
                 {filteredTreaties(activeTab).length > 0 ? (
                     filteredTreaties(activeTab).map((treaty) => (
-                        <div className="treaty-card" key={treaty.id}>
+                        <div
+                            className={`treaty-card 
+                                ${treaty.treaty_status === "accepted" ? "accepted" : ""}
+                                ${treaty.treaty_status === "denied" ? "denied" : ""}`}
+                            key={treaty.id}
+                        >
                             <h3>Treaty ID: {treaty.id}</h3>
                             <p><strong>Initiator:</strong> {treaty.initiator_username}</p>
                             <p><strong>Recipient:</strong> {treaty.recipient_username}</p>
                             <p><strong>Status:</strong> {treaty.treaty_status}</p>
                             <p><strong>Terms:</strong> {treaty.terms}</p>
                             <p><strong>Created At:</strong> {treaty.created_at}</p>
-                            <button onClick={() => handleAcceptTreaty(treaty.id)}>Accept</button>
-                            <button onClick={() => handleDenyTreaty(treaty.id)}>Decline</button>
+                            {treaty.treaty_status === "pending" && (
+                                <>
+                                    <button onClick={() => handleAcceptTreaty(treaty.id)}>Accept</button>
+                                    <button onClick={() => handleDenyTreaty(treaty.id)}>Decline</button>
+                                </>
+                            )}
                         </div>
                     ))
                 ) : (
                     <p>No treaties found for this category.</p>
                 )}
             </div>
+
+
         </div>
     );
 }

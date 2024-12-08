@@ -45,10 +45,6 @@ function CreateTreaty() {
         setFormData({ ...formData, terms: updatedTerms });
     };
 
-    const removeTerm = (index) => {
-        const updatedTerms = formData.terms.filter((_, i) => i !== index);
-        setFormData({ ...formData, terms: updatedTerms });
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -119,9 +115,6 @@ function CreateTreaty() {
                                 onChange={(e) => handleTermChange(index, "text", e.target.value)}
                                 required
                             />
-                            <button type="button" onClick={() => removeTerm(index)}>
-                                Remove
-                            </button>
                         </div>
                     ))}
                     <button type="submit">Create Treaty</button>
